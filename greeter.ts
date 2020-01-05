@@ -20,19 +20,6 @@ function writeLog(resList)
     .writeRecords(resList)
     .then(()=>console.log('Written into .csv!'));
 }
-/*var data = [
-    {
-        'timepoint': 1,
-        'duration': 1,
-        'board_size': 1,
-        'sente': 1,
-        'gote': 1,
-        'result': 1,
-    }
-];
-csvWriter
-    .writeRecords(data)
-    .then(()=>console.log('Written into .csv!'));*/
 
 //to get input from command line
 function getInput([chessboardLen, sente]: [number, number])
@@ -172,6 +159,35 @@ function boardVis(curMat: Array<Array<number>>): Array<number>
     }
 
     return [crossN, circleN];
+}
+
+//to generate a single line of initialized chessboard(not 2 middle lines)
+function initLine1(inputN: Array<number>): Array<number>
+{
+    return Array.from(Array(inputN[1]), (v, k) => -1);
+}
+
+//to generate a single line of initialized chessboard(2 middle lines)
+function initLine2(inputN: Array<number>): Array<number>
+{
+    return initLine1([0, inputN[1]/2-1]).concat([inputN[1] / 2 - inputN[0], 1 + inputN[0] - inputN[1] / 2], initLine1([0, inputN[1]/2-1]));    
+}
+
+//to generate the index list used to generate the initialized chessboard line
+function indexList(chessboardLen: number): Array<Array<number>>
+{
+    return Array.from(Array(chessboardLen), (v, k) => [k, chessboardLen]);
+}
+
+//to select which func should be used to generate lines
+function selectFunc(inputN: Array<number>): Array<number>
+{
+    return inputN[0] == inputN[1]/2 || inputN[0] == inputN[1]/2-1 ? initLine2(inputN) : initLine1(inputN);
+}
+
+function boardIf(chessboardLen: number): Array<Array<number>>
+{
+    return indexList(chessboardLen).map(selectFunc);
 }
 
 function boardInit(chessboardLen: number): Array<Array<number>>
@@ -336,7 +352,8 @@ function runner()
     var chessboardLen: number = 4;
     var sente: number = 0;
     [chessboardLen, sente] = getInput([chessboardLen, sente]);
-    let initBoard = boardInit(chessboardLen);
+    //let initBoard = boardInit(chessboardLen);
+    let initBoard = boardIf(chessboardLen);
     boardVis(initBoard);
     let boardChess: Array<string> = ['X', 'O'];
     let counter: Array<number> = [];

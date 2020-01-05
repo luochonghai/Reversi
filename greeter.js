@@ -18,19 +18,6 @@ function writeLog(resList) {
         .writeRecords(resList)
         .then(function () { return console.log('Written into .csv!'); });
 }
-/*var data = [
-    {
-        'timepoint': 1,
-        'duration': 1,
-        'board_size': 1,
-        'sente': 1,
-        'gote': 1,
-        'result': 1,
-    }
-];
-csvWriter
-    .writeRecords(data)
-    .then(()=>console.log('Written into .csv!'));*/
 //to get input from command line
 function getInput(_a) {
     var chessboardLen = _a[0], sente = _a[1];
@@ -144,6 +131,25 @@ function boardVis(curMat) {
         console.log(curVisRow);
     }
     return [crossN, circleN];
+}
+//to generate a single line of initialized chessboard(not 2 middle lines)
+function initLine1(inputN) {
+    return Array.from(Array(inputN[1]), function (v, k) { return -1; });
+}
+//to generate a single line of initialized chessboard(2 middle lines)
+function initLine2(inputN) {
+    return initLine1([0, inputN[1] / 2 - 1]).concat([inputN[1] / 2 - inputN[0], 1 + inputN[0] - inputN[1] / 2], initLine1([0, inputN[1] / 2 - 1]));
+}
+//to generate the index list used to generate the initialized chessboard line
+function indexList(chessboardLen) {
+    return Array.from(Array(chessboardLen), function (v, k) { return [k, chessboardLen]; });
+}
+//to select which func should be used to generate lines
+function selectFunc(inputN) {
+    return inputN[0] == inputN[1] / 2 || inputN[0] == inputN[1] / 2 - 1 ? initLine2(inputN) : initLine1(inputN);
+}
+function boardIf(chessboardLen) {
+    return indexList(chessboardLen).map(selectFunc);
 }
 function boardInit(chessboardLen) {
     var initBoard = new Array();
@@ -275,7 +281,8 @@ function runner() {
     var chessboardLen = 4;
     var sente = 0;
     _a = getInput([chessboardLen, sente]), chessboardLen = _a[0], sente = _a[1];
-    var initBoard = boardInit(chessboardLen);
+    //let initBoard = boardInit(chessboardLen);
+    var initBoard = boardIf(chessboardLen);
     boardVis(initBoard);
     var boardChess = ['X', 'O'];
     var counter = [];
